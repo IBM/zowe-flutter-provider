@@ -16,8 +16,8 @@ class ResponseStatusMessage {
     });
 
     factory ResponseStatusMessage.fromJson(Map<String, dynamic> json) => ResponseStatusMessage(
-        status: json["status"],
-        message: json["message"],
+        status: json["status"].toString(),
+        message: json["message"].toString(),
         error: true,
     );
 

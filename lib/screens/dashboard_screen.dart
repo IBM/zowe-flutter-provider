@@ -2,6 +2,7 @@ import 'package:dynamic_tabs/dynamic_tabs.dart';
 import 'package:flutter/material.dart';
 
 import 'package:zowe_flutter/router.dart';
+import 'package:zowe_flutter/screens/data_set_create_screen.dart';
 import 'package:zowe_flutter/screens/data_set_list_screen.dart';
 import 'package:zowe_flutter/screens/job_list_screen.dart';
 
@@ -23,15 +24,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
           DynamicTab(
             child: DataSetListScreen(),
             tab: BottomNavigationBarItem(
-              title: Text("Data Sets"),
+              title: Text("List Data Sets"),
               icon: Icon(Icons.view_list),
             ),
             tag: "dataSetList", // Must Be Unique
           ),
           DynamicTab(
+            child: DataSetCreateScreen(),
+            tab: BottomNavigationBarItem(
+              title: Text("Create Data Set"),
+              icon: Icon(Icons.add_box),
+            ),
+            tag: "dataSetCreate", // Must Be Unique
+          ),
+          DynamicTab(
             child: JobListScreen(),
             tab: BottomNavigationBarItem(
-              title: Text("Jobs"),
+              title: Text("List Jobs"),
               icon: Icon(Icons.perm_data_setting),
             ),
             tag: "jobList", // Must Be Unique

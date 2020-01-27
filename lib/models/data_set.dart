@@ -44,6 +44,20 @@ class DataSet {
     this.volumeSerial,
   });
 
+  factory DataSet.randomInitial() => DataSet(
+    allocationUnit: 'TRACK',
+    averageBlock: 500,
+    blockSize: 400,
+    dataSetOrganization: 'PO',
+    deviceType: '3390',
+    directoryBlocks: 5,
+    name: 'HLQ.ZOWE',
+    primary: 10,
+    secondary: 5,
+    recordFormat: 'FB',
+    recordLength: 80
+  );
+
   factory DataSet.fromJson(Map<String, dynamic> json) => DataSet(
         allocatedSize: json["allocatedSize"],
         allocationUnit: json["allocationUnit"],
@@ -83,6 +97,21 @@ class DataSet {
         "recordLength": recordLength,
         "secondary": secondary,
         "used": used,
+        "volumeSerial": volumeSerial,
+      };
+
+  Map<String, dynamic> toPostJson() => {
+        "allocationUnit": allocationUnit != null ? allocationUnit.toString().split('.')[1] : null,
+        "averageBlock": averageBlock,
+        "blockSize": blockSize,
+        "dataSetOrganization": dataSetOrganization != null ? dataSetOrganization.toString().split('.')[1] : null,
+        "deviceType": deviceType,
+        "directoryBlocks": directoryBlocks,
+        "name": name,
+        "primary": primary,
+        "recordFormat": recordFormat,
+        "recordLength": recordLength,
+        "secondary": secondary,
         "volumeSerial": volumeSerial,
       };
 }

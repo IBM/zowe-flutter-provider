@@ -5,70 +5,65 @@ import 'package:provider/provider.dart';
 import 'package:zowe_flutter/enums.dart';
 import 'package:zowe_flutter/models/response_status_message.dart';
 import 'package:zowe_flutter/providers/auth.dart';
-import 'package:zowe_flutter/models/data_set.dart';
-import 'package:zowe_flutter/providers/data_set_list.dart';
+import 'package:zowe_flutter/providers/data_set_members_list.dart';
 import 'package:zowe_flutter/widgets/alert_widget.dart';
 import 'package:zowe_flutter/widgets/loading_widget.dart';
 
-class DataSetListScreen extends StatefulWidget {
+class DataSetMembersListScreen extends StatefulWidget {
   @override
-  _DataSetListScreenState createState() => _DataSetListScreenState();
+  _DataSetMembersListScreenState createState() => _DataSetMembersListScreenState();
 }
 
-class _DataSetListScreenState extends State<DataSetListScreen> {
-  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
-  TextEditingController _filter;
-
+class _DataSetMembersListScreenState extends State<DataSetMembersListScreen> {
   @override
   Widget build(BuildContext context) {
+    final String dataSetName =
+        ModalRoute.of(context).settings.arguments as String;
     final auth = Provider.of<AuthProvider>(context);
+
     return ChangeNotifierProvider(
-      create: (_) => DataSetListProvider.initial(filterString: auth.user.userId, authToken: auth.user.token),
+      create: (_) => DataSetMembersListProvider.initial(
+        dataSetName: dataSetName, 
+        authToken: auth.user.token
+      ),
       child: Consumer(
-        builder: (context, DataSetListProvider dataSetListProvider, _) {
-          _filter = TextEditingController(text: dataSetListProvider.filter);
-          switch (dataSetListProvider.status) {
+        builder: (context, DataSetMembersListProvider dataSetMembersListProvider, _) {
+           switch (dataSetMembersListProvider.status) {
             case Status.Loading:
               return LoadingWidget();
             case Status.Success:
               return Scaffold(
+                appBar: AppBar(
+                  title: Text('Members of ${dataSetMembersListProvider.dataSetName}'),
+                ),
                 body: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(32.0),
-                      child: TextField(
-                        controller: _filter,
-                        decoration: InputDecoration(
-                          hintText: "Filter data sets",
-                          suffixIcon: IconButton(
-                            onPressed: () => dataSetListProvider.getDataSets(
-                              filterString: _filter.text,
-                              authToken: auth.user.token,
-                            ),
-                            icon: Icon(Icons.search),
-                          ),
-                        ),
-                      ),
-                    ),
                     Expanded(
-                      child: ListView.builder(
-                      padding: EdgeInsets.all(16.0),
-                      itemCount: dataSetListProvider.dataSetList.length,
-                      itemBuilder: (context, index) => DataSetItem(
-                          dataSet: dataSetListProvider.dataSetList[index]),
-                      )
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Expanded(
+                            child: ListView.builder(
+                            padding: EdgeInsets.all(16.0),
+                            itemCount: dataSetMembersListProvider.members.length,
+                            itemBuilder: (context, index) => DataSetMemberItem(
+                                memberName: dataSetMembersListProvider.members[index]),
+                            )
+                          )
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ); 
+              );
             case Status.Empty:
               return AlertWidget(
-                message: 'Nothing to display.',
+                message: 'This data set has no members.',
                 color: Colors.amber,
                 icon: Icons.assistant,
-                back: false,
+                back:true,
               );
             case Status.Error:
             default:
@@ -76,28 +71,27 @@ class _DataSetListScreenState extends State<DataSetListScreen> {
                 message: 'An error occured!',
                 color: Colors.redAccent,
                 icon: Icons.warning,
-                back: false,
+                back: true,
               );
           }
-        }
-      
+          
+        },
       ),
     );
-  }
+  } 
 }
 
-class DataSetItem extends StatelessWidget {
-  final DataSet dataSet;
-
-  DataSetItem({this.dataSet});
+class DataSetMemberItem extends StatelessWidget {
+  final String memberName;
+  DataSetMemberItem({this.memberName});
 
   @override
   Widget build(BuildContext context) {
-    final dsListProvider = Provider.of<DataSetListProvider>(context);
+    final dsMembersProvider = Provider.of<DataSetMembersListProvider>(context);
     final authProvider = Provider.of<AuthProvider>(context);
-    final active = dataSet.dataSetOrganization != null && dsListProvider.actionStatus == ActionStatus.Idle;
+    final active = dsMembersProvider.actionStatus == ActionStatus.Idle;
     return ListTile(
-      title: Text(dataSet.name),
+      title: Text(memberName),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
@@ -105,22 +99,11 @@ class DataSetItem extends StatelessWidget {
             icon: Icon(Icons.remove_red_eye),
             color: Colors.black,
             onPressed: !active ? null : () async {
-              switch (dataSet.dataSetOrganization) {
-                case 'PO':
-                case 'PO_E':
-                  Navigator.pushNamed(context, 'dataSetMembers', arguments: dataSet.name);
-                  break;
-                case 'PS':
-                  final result = await Navigator.pushNamed(context, 'dataSetContent', arguments: dataSet.name);
-                  print(result);
-                  if (result == 'refresh') {
-                    dsListProvider.getDataSets(
-                      filterString: dsListProvider.filter,
-                      authToken: authProvider.user.token,
-                    );
-                  }
-                  break;
-                default:
+              final result = await Navigator.pushNamed(context, 'dataSetContent', arguments: '${dsMembersProvider.dataSetName}($memberName)');
+              if (result == 'refresh') {
+                dsMembersProvider.getDataSetMembers(
+                  dataSetName: dsMembersProvider.dataSetName,
+                  authToken: authProvider.user.token);
               }
             },
             tooltip: 'Display',
@@ -128,9 +111,9 @@ class DataSetItem extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.send),
             color: Colors.green,
-            onPressed: !active || dataSet.dataSetOrganization != 'PS' ? null : () async {
-              ResponseStatusMessage response = await dsListProvider.submitAsJob(
-                dataSetName: dataSet.name, 
+            onPressed: !active ? null : () async {
+              ResponseStatusMessage response = await dsMembersProvider.submitAsJob(
+                memberName: memberName, 
                 authToken: authProvider.user.token
               );
 
@@ -152,8 +135,8 @@ class DataSetItem extends StatelessWidget {
             icon: Icon(Icons.delete_forever),
             color: Colors.redAccent,
             onPressed: !active ? null : () async {
-              ResponseStatusMessage response = await dsListProvider.deleteDataSet(
-                dataSetName: dataSet.name,
+              ResponseStatusMessage response = await dsMembersProvider.deleteDataSet(
+                memberName: memberName,
                 authToken: authProvider.user.token,
               );
 
@@ -173,12 +156,11 @@ class DataSetItem extends StatelessWidget {
           ),
         ],
       ),
-      leading: Text(dataSet.dataSetOrganization ?? '-', style: TextStyle(fontWeight: FontWeight.bold),),
-      subtitle:
-          Text('RECF: ${dataSet.recordFormat} | RECL: ${dataSet.recordLength}'),
       dense: false,
-      enabled: dataSet.dataSetOrganization != null,
       isThreeLine: true,
+      subtitle: Text('PDS Member'),
     );
   }
+
 }
+

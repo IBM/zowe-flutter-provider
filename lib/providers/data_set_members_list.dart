@@ -1,74 +1,62 @@
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
-import 'package:http/http.dart';
+import 'package:flutter/material.dart';
 import 'package:zowe_flutter/enums.dart';
 import 'package:zowe_flutter/models/data_set.dart';
 import 'package:zowe_flutter/models/response_status_message.dart';
-import 'package:zowe_flutter/services/api.dart';
+import 'package:zowe_flutter/services/services.dart';
 
-class DataSetListProvider with ChangeNotifier{
-  Status _status = Status.Loading;
+
+class DataSetMembersListProvider extends ChangeNotifier {
+  Status _status = Status.Empty;
   ActionStatus _actionStatus = ActionStatus.Idle;
-  List<DataSet> _dataSetList = [];
-  String _filter = "";
+  DataSet _dataSet;
+  String _dataSetName;
+  List<String> _members;
 
-  DataSetListProvider.initial({String filterString, String authToken}) {
-    getDataSets(filterString: filterString, authToken: authToken);
+  DataSetMembersListProvider.initial({String dataSetName, String authToken}) {
+    _dataSetName = dataSetName;
+    getDataSetMembers(dataSetName: dataSetName, authToken: authToken);
+    notifyListeners();
   }
 
   Status get status => _status;
   ActionStatus get actionStatus => _actionStatus;
-  List<DataSet> get dataSetList => _dataSetList;
-  String get filter => _filter;
+  DataSet get dataSet => _dataSet;
+  String get dataSetName => _dataSetName;
+  List<String> get members => _members;
 
   /// Get list of data sets with filter.
-  Future<ResponseStatusMessage> getDataSets({String filterString, String authToken}) async {
+  Future<ResponseStatusMessage> getDataSetMembers({String dataSetName, String authToken}) async {
     _status = Status.Loading;
-    _filter = filterString;
     notifyListeners();
-
-    // if filter is empty don't bother with http request
-    if (filterString == '') {
-      _status = Status.Success;
-      _dataSetList = [];
-      notifyListeners();
-      return ResponseStatusMessage(status: 'Success', message: 'Data set list fetched', error: false);
-    }
 
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Basic ' + authToken,
     };
 
-    final url = '${ApiService.DATA_SET_ENDPOINT}/$filterString';
-    Response response = await ApiService.ioClient.get(url, headers: headers);
+    final url = '${ApiService.DATA_SET_ENDPOINT}/$dataSetName/members';
+    var response = await ApiService.ioClient.get(url, headers: headers);
     var jsonBody = json.decode(response.body);
 
     if (response.statusCode >= 400) {
+      _members = [];
+      _dataSet = null;
       _status = Status.Error;
-      _dataSetList = [];
       notifyListeners();
       return ResponseStatusMessage.fromJson(jsonBody);
     }
 
-
-    Iterable items = jsonBody['items'];
-    List<DataSet> dataSets = items.map((item) => DataSet.fromJson(item)).toList();
-
-    _status = Status.Success;
-    _dataSetList = dataSets;
-
-    if (dataSets.length == 0) {
-      _status = Status.Empty;
-    }
+    List<dynamic> items = jsonBody['items'];
+    _members = items.map((item) => item.toString()).toList();
+    _status = _members.length > 0 ? Status.Success : Status.Empty;
     notifyListeners();
-
-    return ResponseStatusMessage(status: 'Success', message: 'Data set list fetched', error: false);
+    return ResponseStatusMessage(status: 'Success', message: 'Data set members fetched!', error: false);
   }
 
-  /// Delete data set
-  Future<ResponseStatusMessage> deleteDataSet({String dataSetName, String authToken}) async {
+  /// Delete data set member
+  Future<ResponseStatusMessage> deleteDataSet({String memberName, String authToken}) async {
     _actionStatus = ActionStatus.Working;
     notifyListeners();
 
@@ -77,7 +65,7 @@ class DataSetListProvider with ChangeNotifier{
       'Authorization': 'Basic ' + authToken,
     };
 
-    final url = '${ApiService.DATA_SET_ENDPOINT}/$dataSetName';
+    final url = '${ApiService.DATA_SET_ENDPOINT}/$_dataSetName($memberName)';
     var response = await ApiService.ioClient.delete(url, headers: headers);
 
     _actionStatus = ActionStatus.Idle;
@@ -86,13 +74,13 @@ class DataSetListProvider with ChangeNotifier{
       return ResponseStatusMessage.fromJson(jsonBody);
     }
 
-    _dataSetList.removeWhere((ds) => ds.name == dataSetName);
+    _members.removeWhere((ds) => ds == dataSetName);
     notifyListeners();
     return ResponseStatusMessage(status: 'Success', message: 'Data set deleted', error: false);
   }
 
   /// Submit data set as a job
-  Future<ResponseStatusMessage> submitAsJob({String dataSetName, String authToken}) async {
+  Future<ResponseStatusMessage> submitAsJob({String memberName, String authToken}) async {
     _actionStatus = ActionStatus.Working;
     notifyListeners();
 
@@ -102,7 +90,7 @@ class DataSetListProvider with ChangeNotifier{
     };
 
     Object requestBody = {
-      'file': "'$dataSetName'"
+      'file': "'$_dataSetName($memberName)'"
     };
     String requestBodyJson = json.encode(requestBody);
 
@@ -119,4 +107,5 @@ class DataSetListProvider with ChangeNotifier{
     notifyListeners();
     return ResponseStatusMessage(status: 'Success', message: 'Job is submitted!', error: false);
   }
+
 }

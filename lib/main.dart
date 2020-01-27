@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zowe_flutter/models/user.dart';
 import 'package:zowe_flutter/providers/auth.dart';
 import 'package:zowe_flutter/router.dart';
 import 'package:zowe_flutter/screens/dashboard_screen.dart';
@@ -16,7 +15,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: HomePage(),
-      onGenerateRoute: Router.generateRoute,
+      routes: Router.buildRoutes(context),
     );
   }
 }
