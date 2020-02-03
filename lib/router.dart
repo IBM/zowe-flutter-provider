@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:zowe_flutter/screens/dashboard_screen.dart';
 import 'package:zowe_flutter/screens/data_set_content_screen.dart';
 import 'package:zowe_flutter/screens/data_set_create_screen.dart';
 import 'package:zowe_flutter/screens/data_set_members_list_screen.dart';
+import 'package:zowe_flutter/screens/login_screen.dart';
 
-import 'screens/login_screen.dart';
-import 'screens/dashboard_screen.dart';
 
-const String initialRoute = '/login';
+const String initialRoute = 'login';
 
 class Router {
   static Map<String, WidgetBuilder> buildRoutes(BuildContext context) {

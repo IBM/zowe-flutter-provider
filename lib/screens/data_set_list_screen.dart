@@ -28,8 +28,6 @@ class _DataSetListScreenState extends State<DataSetListScreen> {
         builder: (context, DataSetListProvider dataSetListProvider, _) {
           _filter = TextEditingController(text: dataSetListProvider.filter);
           switch (dataSetListProvider.status) {
-            case Status.Loading:
-              return LoadingWidget();
             case Status.Success:
               return Scaffold(
                 body: Column(
@@ -63,6 +61,8 @@ class _DataSetListScreenState extends State<DataSetListScreen> {
                   ],
                 ),
               ); 
+            case Status.Loading:
+              return LoadingWidget();
             case Status.Empty:
               return AlertWidget(
                 message: 'Nothing to display.',
