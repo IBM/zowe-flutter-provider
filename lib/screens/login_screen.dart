@@ -28,9 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final auth = Provider.of<AuthProvider>(context);
     return Scaffold(
       key: _key,
-      appBar: AppBar(
-        title: Text("Zowe Flutter"),
-      ),
       body: Form(
         key: _formKey,
         child: Center(

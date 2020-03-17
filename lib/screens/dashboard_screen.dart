@@ -5,6 +5,7 @@ import 'package:zowe_flutter/router.dart';
 import 'package:zowe_flutter/screens/data_set_create_screen.dart';
 import 'package:zowe_flutter/screens/data_set_list_screen.dart';
 import 'package:zowe_flutter/screens/job_list_screen.dart';
+import 'package:zowe_flutter/screens/logout_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -18,8 +19,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return DynamicTabScaffold.adaptive(
         routes: Router.buildRoutes(context),
-        persistIndex: true,
+        persistIndex: false,
         maxTabs: 4,
+        moreTabPrimaryColor: Colors.blue,
         tabs: <DynamicTab>[
           DynamicTab(
             child: DataSetListScreen(),
@@ -45,14 +47,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             tag: "jobList", // Must Be Unique
           ),
-          /*DynamicTab(
-            child: LogoutView(),
+          DynamicTab(
+            child: LogoutScreen(),
             tab: BottomNavigationBarItem(
               title: Text("Logout"),
               icon: Icon(Icons.exit_to_app),
             ),
             tag: "logout",
-          ),*/
+          ),
         ]);
   }
 }

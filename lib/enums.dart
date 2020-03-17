@@ -17,3 +17,7 @@ enum AllocationUnit {
 enum DataSetOrganization {
   PO, POU, PO_E, PS, PS_E, PS_L, PSU, VSAM, VSAM_E, HFS, ZFS, DA, DAU
 }
+
+enum JobStatus {
+  ACTIVE, INPUT, OUTPUT, ALL
+}

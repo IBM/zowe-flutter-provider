@@ -4,6 +4,7 @@ import 'package:zowe_flutter/screens/dashboard_screen.dart';
 import 'package:zowe_flutter/screens/data_set_content_screen.dart';
 import 'package:zowe_flutter/screens/data_set_create_screen.dart';
 import 'package:zowe_flutter/screens/data_set_members_list_screen.dart';
+import 'package:zowe_flutter/screens/job_content_screen.dart';
 import 'package:zowe_flutter/screens/login_screen.dart';
 
 
@@ -17,6 +18,7 @@ class Router {
       'dataSetContent': (BuildContext context) => DataSetContentScreen(),
       'dataSetMembers': (BuildContext context) => DataSetMembersListScreen(),
       'dataSetCreate': (BuildContext context) => DataSetCreateScreen(),
+      'jobContent': (BuildContext context) => JobContentScreen(),
     };
   }
 }
