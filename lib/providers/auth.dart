@@ -21,7 +21,7 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     // Data that will be sent
-    var data = {'username': userId, 'password': password};
+    var data = {'username': userId.toUpperCase(), 'password': password};
 
     // Tell the server we are sending a json body
     Map<String, String> headers = {
@@ -45,7 +45,7 @@ class AuthProvider with ChangeNotifier {
     List<int> bytes = utf8.encode(rawUser);
     String base64User = base64.encode(bytes);
 
-    _user = User(userId: userId, token: base64User);
+    _user = User(userId: userId.toUpperCase(), token: base64User);
     _status = AuthStatus.Authenticated;
     notifyListeners();
     return true;

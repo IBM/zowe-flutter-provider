@@ -21,12 +21,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         routes: Router.buildRoutes(context),
         persistIndex: false,
         maxTabs: 4,
-        moreTabPrimaryColor: Colors.blue,
+        moreTabPrimaryColor: Color.fromRGBO(42, 125, 225, 1),
         tabs: <DynamicTab>[
           DynamicTab(
             child: DataSetListScreen(),
             tab: BottomNavigationBarItem(
-              title: Text("List Data Sets"),
+              title: Text("Data Sets"),
               icon: Icon(Icons.view_list),
             ),
             tag: "dataSetList", // Must Be Unique
@@ -42,7 +42,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           DynamicTab(
             child: JobListScreen(),
             tab: BottomNavigationBarItem(
-              title: Text("List Jobs"),
+              title: Text("Jobs"),
               icon: Icon(Icons.perm_data_setting),
             ),
             tag: "jobList", // Must Be Unique

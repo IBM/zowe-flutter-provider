@@ -49,9 +49,9 @@ class _JobContentScreenState extends State<JobContentScreen> {
                           padding: const EdgeInsets.all(16.0),
                           child: TextField(
                             controller: _jobContent,
-                            enabled: false,
+                            readOnly: true,
                             maxLines: null,
-                            autofocus: false,
+
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               isDense: true,
