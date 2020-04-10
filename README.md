@@ -1,16 +1,53 @@
-# zowe_flutter
+# Zowe Flutter Application
+This is a Flutter project with Provider state management that allows interaction with Z (mainframe) on your mobile phone. It consumes Zowe REST APIs to achieve that.
 
-A new Flutter project.
+You can read the full guide on [[Tutorial]: Interact with z/OS using a mobile device with Zowe and Flutter](https://developer.ibm.com/components/ibmz/tutorials/interacting-with-zos-using-mobile-device-with-zowe-and-flutter) or see below for quick info.
 
-## Getting Started
+## Requirements
+- Flutter
+- Access to Zowe (check the guide for details)
 
-This project is a starting point for a Flutter application.
+## Features
+### Data sets
+- Filter and display data sets,
+- Create data sets,
+- Delete data sets,
+- Update data sets.
 
-A few resources to get you started if this is your first Flutter project:
+Works only for Sequential and PDS/PDSE formats.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+### Jobs
+- Display jobs and outputs,
+- Purge jobs,
+- Submit data sets as jobs.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/IBM/zowe-flutter-provider.git
+```
+
+Change directory:
+```bash
+cd zowe-flutter-provider
+```
+
+Install dependencies:
+```bash
+flutter pub get
+```
+
+Run the app:
+```bash
+# Make sure you are in the right directory.
+# Either run iOS/Android simulator, or connect your mobile device via USB in Debug mode.
+
+flutter run
+```
+
+## Help
+You can submit issues for the problems you encounter.
+
